@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bharat Vansh Re-Born Foundation — Login & Patient Records</title>
+
+<style>
+  /* Keep original gradient + styles from your form code */
+  :root{
+    --card-bg: rgba(255,255,255,0.90);
+    --accent: rgba(6, 86, 196, 0.95);
+    --accent-2: rgba(123, 31, 162, 0.95);
+    --muted: #5a5a5a;
+  }
+  html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, Arial, sans-serif;color:#222;}
+  body{
+    background: linear-gradient(120deg, #a6c0fe 0%, #f68084 50%, #cfd9df 100%);
+    background-size: 600% 600%;
+    animation: gradientShift 18s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:40px 16px;
+  }
+  @keyframes gradientShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* Main container (same as your wrapper) */
+  .wrapper{
+    width: 100%;
+    max-width: 1150px;
+    border-radius: 16px;
+    padding: 18px;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.88));
+    box-shadow: 0 10px 30px rgba(20,30,50,0.18);
+    backdrop-filter: blur(6px);
+    position:relative;
+  }
+
+  /* Header with logo left and title */
+  .header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding-bottom:10px;
+    margin-bottom:14px;
+  }
+  .logo {
+    width:78px;
+    height:78px;
+    border-radius:10px;
+    overflow:hidden;
+    flex:0 0 78px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    background: #fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .logo img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .title {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .title h1{
+    margin:0;
+    font-size:22px;
+    letter-spacing:0.3px;
+    color: #0b3a66;
+  }
+  .title p { margin:0; font-size:13px; color:var(--muted); }
+
+  /* Form layout (same) */
+  form#patientForm{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media (max-width:980px){
+    form#patientForm{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width:640px){
+    form#patientForm{ grid-template-columns: 1fr; }
+    .header{gap:12px;}
+  }
+
+  label{ font-size:13px; color:#1a2938; font-weight:600; display:block; margin-bottom:6px; }
+  input[type="text"], input[type="number"], input[type="tel"], input[type="date"], select, textarea {
+    width:100%;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid #d7dbe0;
+    background: #fff;
+    font-size:14px;
+    box-sizing:border-box;
+  }
+  textarea { min-height:64px; resize:vertical; }
+
+  .full { grid-column: 1 / -1; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .photo-preview { display:flex; gap:10px; align-items:center; }
+  .photo-preview img { width:72px; height:72px; object-fit:cover; border-radius:8px; box-shadow: 0 6px 14px rgba(10,20,40,0.08); border:1px solid rgba(0,0,0,0.05); }
+
+  .controls { display:flex; gap:10px; }
+  .btn {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color:#fff;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow: 0 6px 18px rgba(10,70,150,0.14);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn.secondary { background: #6b7280; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+  .btn:hover{ transform: translateY(-2px); }
+
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:14px; margin-bottom:6px; }
+  .search { flex:1; max-width:420px; display:flex; align-items:center; gap:8px; }
+  .search input{ padding:9px 12px; border-radius:10px; border:1px solid #d7dbe0; width:100%; }
+
+  .table-wrap{ overflow:auto; margin-top:10px; border-radius:10px; }
+  table{ width:100%; border-collapse:collapse; min-width:1100px; font-size:14px; }
+  thead th{ background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff; font-weight:700; padding:10px; text-align:left; position:sticky; top:0; }
+  tbody td{ background: #fff; padding:10px; border-bottom:1px solid #eef2f7; vertical-align:middle; }
+  tbody tr:nth-child(even) td{ background: #fbfdff; }
+  .tiny-img { width:46px; height:46px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
+
+  .action-btn { padding:6px 8px; border-radius:7px; border:none; cursor:pointer; font-weight:700; }
+  .edit { background:#ffd166; color:#2c2c2c; }
+  .del { background:#ff6b6b; color:#fff; }
+  .view { background:#6be3b4; color:#064; }
+
+  footer { margin-top:16px; text-align:center; color:var(--muted); font-size:13px; }
+
+  /* ---------- Login overlay styles ---------- */
+  .login-overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(2,6,23,0.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  }
+  .login-box{
+    width:360px;
+    max-width:94%;
+    background:linear-gradient(180deg, #ffffff, #f6f9ff);
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 20px 50px rgba(3,9,28,0.45);
+  }
+  .login-box h2{ margin:0 0 8px 0; color:#0b3a66; font-size:20px; }
+  .login-box p{ margin:0 0 12px 0; color:#5b6b85; font-size:14px; }
+  .login-box label{ display:block; font-weight:700; margin-top:8px; color:#223; }
+  .login-box input{ width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #d7dbe0; font-size:14px; }
+  .login-btn{ margin-top:14px; width:100%; padding:10px; border-radius:8px; border:none; font-weight:800; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; cursor:pointer; }
+  .login-note{ font-size:13px; color:#444; margin-top:8px; text-align:center; }
+</style>
+</head>
+
+<body>
+  <!-- LOGIN OVERLAY (shows first) -->
+  <div id="loginOverlay" class="login-overlay" aria-hidden="false">
+    <div class="login-box" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:56px;height:56px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+          <img src="logo22.jpg" alt="logo" style="width:100%;height:100%;object-fit:contain" onerror="this.style.display='none'">
+        </div>
+        <div>
+          <h2 id="loginTitle">Bharat Vansh Re-Born Foundation</h2>
+          <p style="margin:0;color:#556;">Patient Records — Login</p>
+        </div>
+      </div>
+
+      <label for="loginId">Login ID</label>
+      <input id="loginId" type="text" placeholder="Enter Login ID (e.g. bvrf)" autocomplete="off">
+
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter Password" autocomplete="off">
+
+      <button id="doLogin" class="login-btn">Login</button>
+      
+    </div>
+  </div>
+
+  <!-- MAIN WRAPPER (your original patient form page) -->
+  <div id="mainWrapper" class="wrapper" style="display:none;">
+    <div class="header">
+      <div class="logo">
+        <img src="logo22.jpg" alt="Bharat Vansh Re-Born Foundation Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="title">
+        <h1>Bharat Vansh Re-Born Foundation</h1>
+        <p>De-addiction & Rehabilitation Centre — Patient Records</p>
+      </div>
+      <!-- optional: Logout button placed top-right -->
+      <div style="margin-left:auto;align-self:flex-start;">
+        <button id="logoutBtn" style="background:#ff6b6b;color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;">Logout</button>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form id="patientForm" autocomplete="off">
+      <div>
+        <label>No</label>
+        <input id="no" type="number" placeholder="Serial No">
+      </div>
+
+      <div>
+        <label>Patient ID</label>
+        <input id="patientId" type="text" placeholder="e.g. BV-0001">
+      </div>
+
+      <div>
+        <label>Name</label>
+        <input id="name" type="text" placeholder="Full name">
+      </div>
+
+      <div>
+        <label>Father's Name</label>
+        <input id="fatherName" type="text" placeholder="Father's name">
+      </div>
+
+      <div>
+        <label>Age</label>
+        <input id="age" type="number" min="0" placeholder="Age">
+      </div>
+
+      <div>
+        <label>Gender</label>
+        <select id="gender"><option>Male</option><option>Female</option><option>Other</option></select>
+      </div>
+
+      <div>
+        <label>Addiction Type</label>
+        <input id="addictionType" type="text" placeholder="e.g. Alcohol / Opioid">
+      </div>
+
+      <div>
+        <label>Address</label>
+        <input id="address" type="text" placeholder="Address">
+      </div>
+
+      <div>
+        <label>Contact Number</label>
+        <input id="contactNumber" type="tel" placeholder="Mobile number">
+      </div>
+
+      <div>
+        <label>Aadhaar Number</label>
+        <input id="aadhaarNumber" type="text" placeholder="Aadhaar">
+      </div>
+
+      <div>
+        <label>Date of Admission</label>
+        <input id="dateOfAdmission" type="date">
+      </div>
+
+      <div>
+        <label>Date of Discharge</label>
+        <input id="dateOfDischarge" type="date">
+      </div>
+
+      <div>
+        <label>Doctor / Counsellor Name</label>
+        <input id="doctor" type="text" placeholder="Doctor name">
+      </div>
+
+      <div>
+        <label>Status</label>
+        <select id="status"><option>Admitted</option><option>Discharged</option></select>
+      </div>
+
+      <div class="full">
+        <div style="flex:1">
+          <label>Remarks</label>
+          <textarea id="remarks" placeholder="Any notes or remarks..."></textarea>
+        </div>
+
+        <div style="width:260px">
+          <label>Photo (Upload)</label>
+          <input id="photo" type="file" accept="image/*">
+          <div class="photo-preview" id="photoPreview" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- Hidden for edit index -->
+      <input id="editIndex" type="hidden" value="-1">
+
+      <div class="full" style="justify-content:flex-end; margin-top:6px;">
+        <div class="controls">
+          <button type="button" class="btn" onclick="onSave()">💾 Save Entry</button>
+          <button type="button" class="btn secondary" onclick="onReset()">Reset</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Search + Export -->
+    <div class="toolbar">
+      <div style="font-weight:700; color:#333">Patient Records</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="search">
+          <input id="searchBox" placeholder="Search by name, ID, contact..." oninput="onSearch()" />
+        </div>
+        <div>
+          <button class="btn secondary" onclick="exportCSV()">Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="dataTable" aria-label="Patient records table">
+        <thead>
+          <tr>
+            <th>No</th><th>Patient ID</th><th>Name</th><th>Father's Name</th><th>Age</th>
+            <th>Gender</th><th>Addiction</th><th>Contact</th><th>Aadhaar</th><th>Admission</th>
+            <th>Discharge</th><th>Doctor</th><th>Status</th><th>Remarks</th><th>Photo</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <footer>All rights reserved © Dr. Abhishek Mishra</footer>
+  </div>
+
+<script>
+/* ====== Credentials & config (as requested) ====== */
+const LOGIN_ID = "bvrf";
+const LOGIN_PW = "admin123";
+
+/* ====== (existing form code) ====== */
+const STORAGE_KEY = "bv_patients_v1";
+let ADMIN_PASSWORD = "admin123"; // edit/delete password (kept same as requested)
+
+function readStorage(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch(e){ return []; } }
+function writeStorage(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+/* ====== Login logic ====== */
+const overlay = document.getElementById('loginOverlay');
+const loginBtn = document.getElementById('doLogin');
+const loginIdInput = document.getElementById('loginId');
+const loginPwInput = document.getElementById('loginPassword');
+const mainWrapper = document.getElementById('mainWrapper');
+const logoutBtn = document.getElementById('logoutBtn');
+
+loginBtn.addEventListener('click', function(){
+  const id = loginIdInput.value.trim();
+  const pw = loginPwInput.value;
+  if(id === LOGIN_ID && pw === LOGIN_PW){
+    // successful login — hide overlay, show main page
+    overlay.style.display = 'none';
+    mainWrapper.style.display = '';
+    renderTable();
+  } else {
+    alert("Invalid credentials. Please try again.");
+  }
+});
+
+// Allow Enter key on password to trigger login
+loginPwInput.addEventListener('keyup', function(e){
+  if(e.key === 'Enter') loginBtn.click();
+});
+
+logoutBtn.addEventListener('click', function(){
+  // simple logout — show overlay again
+  overlay.style.display = '';
+  mainWrapper.style.display = 'none';
+  loginIdInput.value = "";
+  loginPwInput.value = "";
+  // scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ====== Photo preview ====== */
+document.getElementById('photo').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  const preview = document.getElementById('photoPreview');
+  preview.innerHTML = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    const img = document.createElement('img');
+    img.src = evt.target.result;
+    img.alt = "Preview";
+    preview.appendChild(img);
+  }
+  reader.readAsDataURL(file);
+});
+
+/* ====== Table render (same as earlier) ====== */
+function renderTable(filterText = "") {
+  const tbody = document.querySelector('#dataTable tbody');
+  tbody.innerHTML = "";
+  const data = readStorage();
+  data.forEach((rec, idx) => {
+    const textCombine = [
+      rec.no, rec.patientId, rec.name, rec.fatherName, rec.contactNumber, rec.aadhaarNumber
+    ].join(" ").toLowerCase();
+    if (filterText && !textCombine.includes(filterText.toLowerCase())) return;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${rec.no || ""}</td>
+      <td>${rec.patientId || ""}</td>
+      <td>${rec.name || ""}</td>
+      <td>${rec.fatherName || ""}</td>
+      <td>${rec.age || ""}</td>
+      <td>${rec.gender || ""}</td>
+      <td>${rec.addictionType || ""}</td>
+      <td>${rec.contactNumber || ""}</td>
+      <td>${rec.aadhaarNumber || ""}</td>
+      <td>${rec.dateOfAdmission || ""}</td>
+      <td>${rec.dateOfDischarge || ""}</td>
+      <td>${rec.doctor || ""}</td>
+      <td>${rec.status || ""}</td>
+      <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${rec.remarks || ""}</td>
+      <td>${rec.photo ? "<img class='tiny-img' src='"+rec.photo+"' alt='photo'>" : ""}</td>
+      <td>
+        <button class="action-btn view" onclick="viewRecord(${idx})">View</button>
+        <button class="action-btn edit" onclick="askAndEdit(${idx})">Edit</button>
+        <button class="action-btn del" onclick="askAndDelete(${idx})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ====== Save / Add / Update ====== */
+function onSave(){
+  const editIndex = Number(document.getElementById('editIndex').value);
+  const rec = collectForm();
+  if (!rec.name && !rec.patientId) { alert("Please enter at least Name or Patient ID."); return; }
+
+  if (editIndex >= 0) {
+    // update
+    const data = readStorage();
+    data[editIndex] = rec;
+    writeStorage(data);
+    document.getElementById('editIndex').value = -1;
+    alert("Record updated.");
+  } else {
+    const data = readStorage();
+    data.push(rec);
+    writeStorage(data);
+    alert("Record saved.");
+  }
+  onReset();
+  renderTable(document.getElementById('searchBox').value);
+}
+
+function collectForm(){
+  const previewImg = document.querySelector('#photoPreview img');
+  const photoData = previewImg ? previewImg.src : "";
+  return {
+    no: document.getElementById('no').value.trim(),
+    patientId: document.getElementById('patientId').value.trim(),
+    name: document.getElementById('name').value.trim(),
+    fatherName: document.getElementById('fatherName').value.trim(),
+    age: document.getElementById('age').value.trim(),
+    gender: document.getElementById('gender').value,
+    addictionType: document.getElementById('addictionType').value.trim(),
+    address: document.getElementById('address').value.trim(),
+    contactNumber: document.getElementById('contactNumber').value.trim(),
+    aadhaarNumber: document.getElementById('aadhaarNumber').value.trim(),
+    dateOfAdmission: document.getElementById('dateOfAdmission').value,
+    dateOfDischarge: document.getElementById('dateOfDischarge').value,
+    remarks: document.getElementById('remarks').value.trim(),
+    doctor: document.getElementById('doctor').value.trim(),
+    status: document.getElementById('status').value,
+    photo: photoData
+  }
+}
+
+function onReset(){
+  document.getElementById('patientForm').reset();
+  document.getElementById('photoPreview').innerHTML = "";
+  document.getElementById('editIndex').value = -1;
+}
+
+/* ====== Password protected edit/delete ====== */
+function askPassword(){
+  const p = prompt("Enter admin password:");
+  if (p === null) return null; // cancelled
+  return p === ADMIN_PASSWORD;
+}
+
+function askAndDelete(index){
+  const ok = askPassword();
+  if (ok === null) return;
+  if (!ok) { alert("Incorrect password."); return; }
+  const data = readStorage();
+  if (index >= 0 && index < data.length){
+    if (confirm("Delete this record permanently?")) {
+      data.splice(index,1);
+      writeStorage(data);
+      renderTable(document.getElementById('searchBox').value);
+    }
+  }
+}
+
+function askAndEdit(index){
+  const ok = askPassword();
+  if (ok === null) return;
+  if (!ok) { alert("Incorrect password."); return; }
+  loadRecordToForm(index);
+}
+
+/* ====== Load record to form for editing ====== */
+function loadRecordToForm(index){
+  const data = readStorage();
+  const rec = data[index];
+  if (!rec) return;
+  document.getElementById('no').value = rec.no || "";
+  document.getElementById('patientId').value = rec.patientId || "";
+  document.getElementById('name').value = rec.name || "";
+  document.getElementById('fatherName').value = rec.fatherName || "";
+  document.getElementById('age').value = rec.age || "";
+  document.getElementById('gender').value = rec.gender || "Male";
+  document.getElementById('addictionType').value = rec.addictionType || "";
+  document.getElementById('address').value = rec.address || "";
+  document.getElementById('contactNumber').value = rec.contactNumber || "";
+  document.getElementById('aadhaarNumber').value = rec.aadhaarNumber || "";
+  document.getElementById('dateOfAdmission').value = rec.dateOfAdmission || "";
+  document.getElementById('dateOfDischarge').value = rec.dateOfDischarge || "";
+  document.getElementById('remarks').value = rec.remarks || "";
+  document.getElementById('doctor').value = rec.doctor || "";
+  document.getElementById('status').value = rec.status || "Admitted";
+  document.getElementById('editIndex').value = index;
+
+  const preview = document.getElementById('photoPreview');
+  preview.innerHTML = rec.photo ? `<img src="${rec.photo}" alt="photo">` : "";
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ====== View record (quick modal-like) ====== */
+function viewRecord(index){
+  const data = readStorage();
+  const rec = data[index];
+  if (!rec) return;
+  const lines = [
+    `Patient ID: ${rec.patientId || ""}`,
+    `Name: ${rec.name || ""}`,
+    `Father's Name: ${rec.fatherName || ""}`,
+    `Age: ${rec.age || ""}   Gender: ${rec.gender || ""}`,
+    `Addiction: ${rec.addictionType || ""}`,
+    `Contact: ${rec.contactNumber || ""}  Aadhaar: ${rec.aadhaarNumber || ""}`,
+    `Admission: ${rec.dateOfAdmission || ""}  Discharge: ${rec.dateOfDischarge || ""}`,
+    `Doctor: ${rec.doctor || ""}`,
+    `Status: ${rec.status || ""}`,
+    `Remarks: ${rec.remarks || ""}`
+  ].join("\n");
+  let message = lines;
+  if (rec.photo) {
+    const w = window.open("", "_blank", "width=600,height=600");
+    w.document.write("<title>Record Preview</title>");
+    w.document.write("<div style='font-family:Segoe UI,Arial; padding:18px;'>");
+    w.document.write(`<h2 style='margin-top:0'>${rec.name || "Patient"}</h2>`);
+    w.document.write(`<img src="${rec.photo}" style="max-width:180px;border-radius:8px;display:block;margin-bottom:12px">`);
+    w.document.write(`<pre style='white-space:pre-wrap;font-size:14px'>${message}</pre>`);
+    w.document.write("</div>");
+    w.document.close();
+  } else {
+    alert(message);
+  }
+}
+
+/* ====== Search ====== */
+function onSearch(){
+  const q = document.getElementById('searchBox').value || "";
+  renderTable(q);
+}
+
+/* ====== Export CSV ====== */
+function exportCSV(){
+  const data = readStorage();
+  if (!data.length){ alert("No records to export."); return; }
+  const header = ["No","Patient ID","Name","Father's Name","Age","Gender","Addiction Type","Address","Contact Number","Aadhaar Number","Date of Admission","Date of Discharge","Remarks","Doctor","Status"];
+  const rows = data.map(r => header.map(h => {
+    const key = {
+      "No":"no","Patient ID":"patientId","Name":"name","Father's Name":"fatherName","Age":"age","Gender":"gender","Addiction Type":"addictionType","Address":"address","Contact Number":"contactNumber","Aadhaar Number":"aadhaarNumber","Date of Admission":"dateOfAdmission","Date of Discharge":"dateOfDischarge","Remarks":"remarks","Doctor":"doctor","Status":"status"
+    }[h];
+    return `"${(r[key]||"").toString().replace(/"/g,'""')}"`;
+  }).join(","));
+  const csv = [header.join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "BharatVansh_Patients.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ====== Init ====== */
+window.addEventListener('load', function(){
+  // show overlay on load; main hidden until login
+  document.getElementById('mainWrapper').style.display = 'none';
+  renderTable();
+});
+</script>
+</body>
+</html>
